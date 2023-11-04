@@ -32,7 +32,7 @@ public class PlayerMoveState : PlayerGroundedState
 
         player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
 
-        if (xInput == 0 || (xInput == player.facingDirection && player.IsWallDetected()))
+        if (xInput == 0 || player.IsWallDetected())
             stateMachine.ChangeState(player.IdleState);
     }
 }
@@ -41,6 +41,12 @@ public class PlayerIdleState : PlayerGroundedState
 {
     public PlayerIdleState(Player _player, PlayerStateMachine _stateMachine, string animBoolName) : base(_player, _stateMachine, animBoolName)
     {
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+        rb.velocity = Vector2.zero;
     }
 
     public override void Update()
