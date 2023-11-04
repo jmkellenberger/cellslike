@@ -117,6 +117,4 @@ public class Player : MonoBehaviour
             StateMachine.ChangeState(DashState);
         }
     }
-
-
 }
