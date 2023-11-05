@@ -23,9 +23,13 @@ public class PlayerWallSlideState : PlayerState
             stateMachine.ChangeState(player.IdleState);
 
         if (yInput < 0)
-            rb.velocity = new Vector2(0, rb.velocity.y);
+            player.SetVelocity(0, rb.velocity.y);
         else
-            rb.velocity = new Vector2(0, rb.velocity.y * .7f);
+            player.SetVelocity(0, rb.velocity.y * .7f);
+
+        if (!player.IsWallDetected())
+            stateMachine.ChangeState(player.AirState);
+
     }
 }
 

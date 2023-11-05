@@ -14,10 +14,18 @@ public class PlayerAirState : PlayerState
         base.Update();
 
         if (player.IsWallDetected())
+        {
             stateMachine.ChangeState(player.WallSlideState);
+            return;
+        }
+
 
         if (player.IsGroundDetected())
+        {
             stateMachine.ChangeState(player.IdleState);
+            return;
+        }
+
 
         if (xInput != 0)
             player.SetVelocity(player.moveSpeed * .8f * xInput, rb.velocity.y);
@@ -33,8 +41,7 @@ public class PlayerJumpState : PlayerAirState
     public override void Enter()
     {
         base.Enter();
-
-        rb.velocity = new Vector2(rb.velocity.x, player.jumpForce);
+        player.SetVelocity(rb.velocity.x, player.jumpForce);
     }
 
     public override void Update()

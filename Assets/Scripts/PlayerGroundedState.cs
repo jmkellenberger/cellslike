@@ -15,10 +15,39 @@ public class PlayerGroundedState : PlayerState
         if (!player.IsGroundDetected())
             stateMachine.ChangeState(player.AirState);
 
-        if (Input.GetKeyDown(KeyCode.Space) && player.IsGroundDetected())
+        if (Input.GetKeyDown(KeyCode.Space))
             stateMachine.ChangeState(player.JumpState);
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+            stateMachine.ChangeState(player.PrimaryAttackState);
     }
 }
+
+
+public class PlayerIdleState : PlayerGroundedState
+{
+    public PlayerIdleState(Player _player, PlayerStateMachine _stateMachine, string animBoolName) : base(_player, _stateMachine, animBoolName)
+    {
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+        player.ZeroVelocity();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (xInput == player.facingDirection && player.IsWallDetected())
+            return;
+
+        if (xInput != 0 && !player.IsBusy)
+            stateMachine.ChangeState(player.MoveState);
+    }
+}
+
 
 public class PlayerMoveState : PlayerGroundedState
 {
@@ -34,29 +63,5 @@ public class PlayerMoveState : PlayerGroundedState
 
         if (xInput == 0 || player.IsWallDetected())
             stateMachine.ChangeState(player.IdleState);
-    }
-}
-
-public class PlayerIdleState : PlayerGroundedState
-{
-    public PlayerIdleState(Player _player, PlayerStateMachine _stateMachine, string animBoolName) : base(_player, _stateMachine, animBoolName)
-    {
-    }
-
-    public override void Enter()
-    {
-        base.Enter();
-        rb.velocity = Vector2.zero;
-    }
-
-    public override void Update()
-    {
-        base.Update();
-
-        if (xInput == player.facingDirection && player.IsWallDetected())
-            return;
-
-        if (xInput != 0)
-            stateMachine.ChangeState(player.MoveState);
     }
 }

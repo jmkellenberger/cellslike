@@ -6,6 +6,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+
+    [Header("Attack")]
+    public Vector2[] attackMovement;
+
     [Header("Movement")]
     public float moveSpeed = 8f;
     public float jumpForce;
@@ -27,6 +31,9 @@ public class Player : MonoBehaviour
     public int facingDirection = 1;
     private bool facingRight = true;
 
+
+    public bool IsBusy { get; private set; }
+
     #region Components
     public Animator Anim { get; private set; }
     public Camera Cam { get; private set; }
@@ -42,6 +49,8 @@ public class Player : MonoBehaviour
     public PlayerWallJumpState WallJumpState { get; private set; }
     public PlayerJumpState JumpState { get; private set; }
     public PlayerDashState DashState { get; private set; }
+
+    public PlayerPrimaryAttackState PrimaryAttackState { get; private set; }
     #endregion
 
     private void Awake()
@@ -53,7 +62,9 @@ public class Player : MonoBehaviour
         AirState = new PlayerAirState(this, StateMachine, "Jump");
         WallSlideState = new PlayerWallSlideState(this, StateMachine, "WallSlide");
         WallJumpState = new PlayerWallJumpState(this, StateMachine, "Jump");
-        DashState = new PlayerDashState(this, StateMachine, "Jump");
+        DashState = new PlayerDashState(this, StateMachine, "Dash");
+
+        PrimaryAttackState = new PlayerPrimaryAttackState(this, StateMachine, "Attack");
     }
 
     void Start()
@@ -68,9 +79,26 @@ public class Player : MonoBehaviour
     {
         StateMachine.CurrentState.Update();
         CheckForDashInput();
+        UpdateCameraPosition();
+    }
+
+    public IEnumerator BusyFor(float _seconds)
+    {
+        IsBusy = true;
+
+        yield return new WaitForSeconds(_seconds);
+
+        IsBusy = false;
+    }
+
+    public void AnimationTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
+
+    private void UpdateCameraPosition()
+    {
         Cam.transform.position = new Vector3(transform.position.x, transform.position.y, Cam.transform.position.z);
     }
 
+    public void ZeroVelocity() => Rb.velocity = Vector2.zero;
 
     public void SetVelocity(float _xVelocity, float _yVelocity)
     {
